@@ -104,6 +104,30 @@ public:
     }
 };
 
+void saveData(const vector<vector<int>>& graph, const vector<string>& entityNames) {
+    ofstream file(DATA_FILE);
+    if (!file) {
+        cerr << "Error: Unable to open file for saving data.\n";
+        return;
+    }
+
+    // Save entities
+    file << entityNames.size() << "\n";
+    for (const string& name : entityNames) {
+        file << name << "\n";
+    }
+
+    // Save graph
+    int size = graph.size();
+    for (int i = 0; i < size; i++) {
+        for (int j = 0; j < size; j++) {
+            file << graph[i][j] << " ";
+        }
+        file << "\n";
+    }
+
+    file.close();
+}
 
 int main(){
 
