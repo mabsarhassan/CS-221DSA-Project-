@@ -155,6 +155,16 @@ void loadData(vector<vector<int>>& graph, vector<string>& entityNames) {
 
     file.close();
 }
+void mergeSort(vector<Entity>& entities, int left, int right) {
+    if (left < right) {
+        int mid = left + (right - left) / 2;
+
+        mergeSort(entities, left, mid);
+        mergeSort(entities, mid + 1, right);
+
+        merge(entities, left, mid, right);
+    }
+}
 
 int main(){
 
