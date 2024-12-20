@@ -129,6 +129,33 @@ void saveData(const vector<vector<int>>& graph, const vector<string>& entityName
     file.close();
 }
 
+void loadData(vector<vector<int>>& graph, vector<string>& entityNames) {
+    ifstream file(DATA_FILE);
+    if (!file) {
+        cerr << "\nNo previous data found. Starting fresh...\n";
+        return;
+    }
+
+    int numEntities;
+    file >> numEntities;
+    entityNames.resize(numEntities);
+
+    // Load entity names
+    for (int i = 0; i < numEntities; i++) {
+        file >> entityNames[i];
+    }
+
+    // Load graph
+    graph.resize(numEntities, vector<int>(numEntities, 0));
+    for (int i = 0; i < numEntities; i++) {
+        for (int j = 0; j < numEntities; j++) {
+            file >> graph[i][j];
+        }
+    }
+
+    file.close();
+}
+
 int main(){
 
     return 0;
