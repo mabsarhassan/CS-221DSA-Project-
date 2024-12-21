@@ -231,6 +231,55 @@ void viewTransactionHistory() {
     historyFile.close();
 }
 
+void minimizeCashFlow(vector<vector<int>>& graph, const vector<string>& entityNames) {
+    int numEntities = graph.size();
+    vector<int> netAmounts(numEntities, 0);
+    vector<Entity> transactionList; // To store transactions
+
+    // Calculate net amounts
+    for (int i = 0; i < numEntities; i++) {
+        for (int j = 0; j < numEntities; j++) {
+            netAmounts[j] += graph[i][j];
+            netAmounts[j] -= graph[j][i];
+        }
+    }
+
+    bool allZero = all_of(netAmounts.begin(), netAmounts.end(), [](int amount) { return amount == 0; });
+    if (allZero) {
+        cout << "\nNo transactions are required as all debts are already settled.\n";
+        return;
+    }
+
+    cout << "\nOptimized Transactions:\n";
+    while (true) {
+        int maxCreditor = max_element(netAmounts.begin(), netAmounts.end()) - netAmounts.begin();
+        int maxDebtor = min_element(netAmounts.begin(), netAmounts.end()) - netAmounts.begin();
+
+        if (netAmounts[maxCreditor] == 0 && netAmounts[maxDebtor] == 0) break;
+
+        int minTransaction = min(abs(netAmounts[maxDebtor]), netAmounts[maxCreditor]);
+        netAmounts[maxDebtor] += minTransaction;
+        netAmounts[maxCreditor] -= minTransaction;
+
+        string log = entityNames[maxDebtor] + " pays " + to_string(minTransaction) + " to " + entityNames[maxCreditor];
+        cout << log << "\n";
+
+        // Add transaction to list for sorting later
+        transactionList.push_back({entityNames[maxDebtor] + " pays " + entityNames[maxCreditor], minTransaction});
+
+        logTransaction(log);
+    }
+
+    // Sort transactions by amount using mergeSort
+    mergeSort(transactionList, 0, transactionList.size() - 1);
+
+    // Display sorted transactions
+    cout << "\nSorted Optimized Transactions by Amount:\n";
+    for (const auto& t : transactionList) {
+        cout << t.name << " amount: " << t.netAmount << "\n";
+    }
+}
+
 void addTransaction(vector<vector<int>>& graph, const vector<string>& entityNames, unordered_map<string, int>& indexMap, TransactionManager &manager) {
     string debtor, creditor;
     int amount;
