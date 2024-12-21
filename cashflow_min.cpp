@@ -231,6 +231,30 @@ void viewTransactionHistory() {
     historyFile.close();
 }
 
+void addTransaction(vector<vector<int>>& graph, const vector<string>& entityNames, unordered_map<string, int>& indexMap, TransactionManager &manager) {
+    string debtor, creditor;
+    int amount;
+
+    cout << "Enter Debtor Name: ";
+    cin >> debtor;
+    cout << "Enter Creditor Name: ";
+    cin >> creditor;
+    cout << "Enter Amount: ";
+    cin >> amount;
+
+    if (indexMap.find(debtor) == indexMap.end() || indexMap.find(creditor) == indexMap.end()) {
+        cout << "Error: One or both entities not found.\n";
+        return;
+    }
+
+    manager.addTransaction(debtor, creditor, amount);
+
+    graph[indexMap[debtor]][indexMap[creditor]] += amount;
+    string log = debtor + " pays " + to_string(amount) + " to " + creditor;
+    ofstream historyFile("final_transaction_history.txt", ios::app);
+    historyFile << log << endl;
+	
+}
 
 int main(){
 
