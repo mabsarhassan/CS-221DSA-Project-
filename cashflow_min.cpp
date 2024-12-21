@@ -334,7 +334,24 @@ void addTransaction(vector<vector<int>>& graph, const vector<string>& entityName
     historyFile << log << endl;
 	
 }
+void addEntity(vector<string>& entityNames, vector<vector<int>>& graph, unordered_map<string, int>& indexMap) {
+    string name;
+    cout << "Enter New Entity Name: ";
+    cin >> name;
 
+    if (indexMap.find(name) != indexMap.end()) {
+        cout << "Entity already exists.\n";
+        return;
+    }
+
+    entityNames.push_back(name);
+    indexMap[name] = entityNames.size() - 1;
+
+    for (auto& row : graph) {
+        row.push_back(0);
+    }
+    graph.push_back(vector<int>(entityNames.size(), 0));
+}
 int main(){
 
     vector<vector<int>> graph;
