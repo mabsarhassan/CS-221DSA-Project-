@@ -35,7 +35,7 @@ public:
 	TransactionManager() : head(nullptr) {}
 	
     // Add a new transaction to the linked list
-    void addTransaction(const string& debtor, const string& creditor, int amount) {
+    Transaction* addTransaction(const string& debtor, const string& creditor, int amount) {
         // Save the current head to the undo stack
         undoStack.push(head);
 
@@ -50,6 +50,7 @@ public:
         head = newTransaction;
 
         cout << "Transaction added: " << debtor << " owes " << amount << " to " << creditor << endl;
+	return newTransaction;
     }
 
     // Undo the last transaction
