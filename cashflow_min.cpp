@@ -215,6 +215,23 @@ void logTransaction(const string& log) {
     historyFile.close();
 }
 
+void viewTransactionHistory() {
+    ifstream historyFile(HISTORY_FILE);
+    if (!historyFile) {
+        cerr << "No transaction history found.\n";
+        return;
+    }
+
+    cout << "\nTransaction History with Timestamps:\n";
+    string line;
+    while (getline(historyFile, line)) {
+        cout << line << "\n";
+    }
+
+    historyFile.close();
+}
+
+
 int main(){
 
     return 0;
