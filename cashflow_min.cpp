@@ -23,6 +23,72 @@ public:
 
 };
 
+// Node for the BST
+class TransactionNodeBST{
+public:
+    Transaction* transaction;
+    TransactionNodeBST* left;
+    TransactionNodeBST* right;
+
+    TransactionNodeBST(Transaction* t) : transaction(t), left(nullptr), right(nullptr) {}
+};
+
+// BST Class for Sorting Transactions
+class TransactionBST {
+private:
+    TransactionNodeBST* root;
+
+    // Helper function to insert into the BST
+    TransactionNodeBST* insert(TransactionNodeBST* node, Transaction* transaction) {
+        if (!node) return new TransactionNodeBST(transaction);
+
+        if (transaction->amount < node->transaction->amount) {
+            node->left = insert(node->left, transaction);
+        } else {
+            node->right = insert(node->right, transaction);
+        }
+        return node;
+    }
+
+    // Helper function for in-order traversal
+    void inOrderTraversal(TransactionNodeBST* node) {
+        if (!node) return;
+
+        inOrderTraversal(node->left);
+        Transaction* t = node->transaction;
+        cout << t->debtor << " owes " << t->creditor << " amount: " << t->amount
+             << " at " << ctime(&(t->timestamp));
+        inOrderTraversal(node->right);
+    }
+
+    // Helper function to delete the tree
+    void deleteTree(TransactionNodeBST* node) {
+        if (!node) return;
+
+        deleteTree(node->left);
+        deleteTree(node->right);
+        delete node;
+    }
+
+public:
+    TransactionBST() : root(nullptr) {}
+
+    // Insert a transaction into the BST
+    void insertTransaction(Transaction* transaction) {
+        root = insert(root, transaction);
+    }
+
+    // Display transactions in sorted order
+    void displaySortedTransactions() {
+        cout << "\nTransactions Sorted by Amount (Ascending):\n";
+        inOrderTraversal(root);
+    }
+
+    // Destructor to clean up the tree
+    ~TransactionBST() {
+        deleteTree(root);
+    }
+};
 
 class TransactionManager {
 private:
@@ -327,7 +393,8 @@ void addTransaction(vector<vector<int>>& graph, const vector<string>& entityName
         return;
     }
 
-    manager.addTransaction(debtor, creditor, amount);
+    Transaction* newTransaction = manager.addTransaction(debtor, creditor, amount);
+    bst.insertTransaction(newTransaction);
 
     graph[indexMap[debtor]][indexMap[creditor]] += amount;
     string log = debtor + " pays " + to_string(amount) + " to " + creditor;
