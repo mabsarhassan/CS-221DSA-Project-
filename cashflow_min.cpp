@@ -337,5 +337,83 @@ void addTransaction(vector<vector<int>>& graph, const vector<string>& entityName
 
 int main(){
 
+    vector<vector<int>> graph;
+    vector<string> entityNames;
+    unordered_map<string, int> indexMap;
+    TransactionManager manager;
+
+   cout << "\n\t\t********************* Welcome to CASH FLOW MINIMIZER SYSTEM ***********************\n\n";
+   cout << "This system minimizes the number of transactions among multiple entities.\n\n";
+
+   if (!authenticateUser()) {
+        return 0;
+    }
+
+   loadData(graph, entityNames);
+    for (int i = 0; i < entityNames.size(); i++) {
+        indexMap[entityNames[i]] = i;
+    }
+
+    while (true) {
+        cout << "\nMenu:\n";
+	cout << "1. Add New Entity\n";
+        cout << "2. Add Transaction\n";
+        cout << "3. Minimize Transactions\n";
+        cout << "4. View Transaction History\n";
+        cout << "5. Undo Last Transaction\n";
+        cout << "6. Redo Last Transaction\n";
+        cout << "7. Clear All Transaction\n";
+        cout << "8. View Latest Transaction\n";
+        cout << "9. Exit\n";
+
+        cout << "\nEnter your choice: ";
+        int choice;
+        cin >> choice;
+	
+	 switch (choice) {
+            case 1:
+                addEntity(entityNames, graph, indexMap);
+                break;
+
+            case 2:
+                addTransaction(graph, entityNames, indexMap, manager);
+                break;
+                
+            case 3:
+                minimizeCashFlow(graph, entityNames);
+                break;
+
+            case 4:
+                viewTransactionHistory();
+                break;
+            
+            case 5:
+                manager.undo();
+                break;
+
+            case 6:
+                manager.redo();
+                break;
+
+            case 7:
+                manager.clearTransactions();
+                break;
+
+            case 8:
+                cout << "\nCurrent Transactions:\n";
+                manager.displayTransactions();
+                break;
+            
+            case 9:
+                saveData(graph, entityNames);
+                cout << "\nProgram Ended! Data is successfully saved.\n";
+                return 0;
+
+            default:
+                cout << "Invalid choice. Please try again.\n";
+      }
+   }
+}
+
     return 0;
 }
