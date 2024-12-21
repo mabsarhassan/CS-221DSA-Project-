@@ -23,86 +23,116 @@ public:
 
 };
 
+
 class TransactionManager {
 private:
-    stack<vector<Transaction>> undoStack; // Stack for undo history
-    stack<vector<Transaction>> redoStack; // Stack for redo history
+	Transaction* head; // Head of the linked list
+    stack<Transaction*> undoStack; // Stack for undo history
+    stack<Transaction*> redoStack; // Stack for redo history
     vector<Transaction> transactions;     // Current transactions
 
 public:
+	TransactionManager() : head(nullptr) {}
+	
+    // Add a new transaction to the linked list
     void addTransaction(const string& debtor, const string& creditor, int amount) {
-        // Save current state to undo stack
-        undoStack.push(transactions);
+        // Save the current head to the undo stack
+        undoStack.push(head);
 
         // Clear redo stack since future redo history is invalidated
-        while (!redoStack.empty()) 
-        {
+        while (!redoStack.empty()) {
             redoStack.pop();
         }
 
-        // Add the new transaction
-        transactions.emplace_back(debtor, creditor, amount);
-        //cout << "Transaction added: " << debtor << " owes " << amount << " to " << creditor << endl;
+        // Create a new transaction and add it to the front of the linked list
+        Transaction* newTransaction = new Transaction(debtor, creditor, amount);
+        newTransaction->next = head;
+        head = newTransaction;
+
+        cout << "Transaction added: " << debtor << " owes " << amount << " to " << creditor << endl;
     }
 
+    // Undo the last transaction
     void undo() {
         if (undoStack.empty()) {
             cout << "No actions to undo.\n";
             return;
         }
 
-        // Save current state to redo stack
-        redoStack.push(transactions);
+        // Save current head to the redo stack
+        redoStack.push(head);
 
-        // Restore previous state
-        transactions = undoStack.top();
+        // Restore the previous state
+        head = undoStack.top();
         undoStack.pop();
 
         cout << "Undo successful. Current transactions:\n";
         displayTransactions();
     }
 
+    // Redo the last undone transaction
     void redo() {
         if (redoStack.empty()) {
             cout << "No actions to redo.\n";
             return;
         }
 
-        // Save current state to undo stack
-        undoStack.push(transactions);
+        // Save current head to the undo stack
+        undoStack.push(head);
 
-        // Restore last undone state
-        transactions = redoStack.top();
+        // Restore the last undone state
+        head = redoStack.top();
         redoStack.pop();
 
         cout << "Redo successful. Current transactions:\n";
         displayTransactions();
     }
 
-    void clearTransactions() {
-        // Save current state to undo stack
-        undoStack.push(transactions);
-
-        // Clear redo stack
-        while (!redoStack.empty()){
-                redoStack.pop();
-        }
-
-        transactions.clear();
-        cout << "All transactions have been cleared.\n";
-    }
-
+    // Display all transactions
     void displayTransactions() {
-        if (transactions.empty()) {
+        if (!head) {
             cout << "No transactions found.\n";
             return;
         }
 
-        for (const auto& t : transactions) {
-            cout << t.debtor << " owes " << t.creditor << " amount: " << t.amount << endl;
+        Transaction* current = head;
+        while (current) {
+            cout << current->debtor << " owes " << current->creditor << " amount: " << current->amount
+                 << " at " << ctime(&(current->timestamp));
+            current = current->next;
+        }
+    }
+
+    // Clear all transactions
+    void clearTransactions() {
+        // Save current head to the undo stack
+        undoStack.push(head);
+
+        // Clear the linked list
+        while (head) {
+            Transaction* temp = head;
+            head = head->next;
+            delete temp;
+        }
+
+        // Clear redo stack
+        while (!redoStack.empty()) {
+            redoStack.pop();
+        }
+
+        cout << "All transactions have been cleared.\n";
+    }
+
+    // Destructor to clean up the linked list
+    ~TransactionManager() {
+        while (head) {
+            Transaction* temp = head;
+            head = head->next;
+            delete temp;
         }
     }
 };
+
 
 void saveData(const vector<vector<int>>& graph, const vector<string>& entityNames) {
     ofstream file(DATA_FILE);
