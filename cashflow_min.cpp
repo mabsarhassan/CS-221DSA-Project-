@@ -155,6 +155,43 @@ void loadData(vector<vector<int>>& graph, vector<string>& entityNames) {
 
     file.close();
 }
+// Merge Sort Functions for Sorting Entities by Net Amount
+void merge(vector<Entity>& entities, int left, int mid, int right) {
+    int n1 = mid - left + 1;
+    int n2 = right - mid;
+
+    vector<Entity> leftEntities(n1);
+    vector<Entity> rightEntities(n2);
+
+    for (int i = 0; i < n1; i++)
+        leftEntities[i] = entities[left + i];
+    for (int i = 0; i < n2; i++)
+        rightEntities[i] = entities[mid + 1 + i];
+
+    int i = 0, j = 0, k = left;
+    while (i < n1 && j < n2) {
+        if (leftEntities[i].netAmount <= rightEntities[j].netAmount) {
+            entities[k] = leftEntities[i];
+            i++;
+        } else {
+            entities[k] = rightEntities[j];
+            j++;
+        }
+        k++;
+    }
+
+    while (i < n1) {
+        entities[k] = leftEntities[i];
+        i++;
+        k++;
+    }
+
+    while (j < n2) {
+        entities[k] = rightEntities[j];
+        j++;
+        k++;
+    }
+}
 void mergeSort(vector<Entity>& entities, int left, int right) {
     if (left < right) {
         int mid = left + (right - left) / 2;
