@@ -203,6 +203,18 @@ void mergeSort(vector<Entity>& entities, int left, int right) {
     }
 }
 
+void logTransaction(const string& log) {
+    ofstream historyFile(HISTORY_FILE, ios::app);
+    if (!historyFile) {
+        cerr << "Error: Unable to open transaction history file.\n";
+        return;
+    }
+    time_t now = time(0);
+    char* dt = ctime(&now); // Convert time to a readable string
+    historyFile << log << " | Time: " << dt; // Add timestamp to the log
+    historyFile.close();
+}
+
 int main(){
 
     return 0;
